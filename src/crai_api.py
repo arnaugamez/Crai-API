@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests
+import requests, bs4
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -28,6 +28,7 @@ class SessionCrai:
 		try:
 			self.login(id, pwd, uses_barcode)
 			print "Logged correctly"
+			self.profile_url = self.login_request.url
 		
 		except LoginError:
 			print "Cannot login. Check your credentials"
@@ -86,6 +87,27 @@ class SessionCrai:
 		#Making the request
 		self.last_request = self.session.post(renew_url, renew_payload, verify=False)
 
+	def getBooks(self):
+		s = ''
+		profile_request = self.session.get(self.profile_url)
+		soup = bs4.BeautifulSoup(profile_request.text)
+		
+		for book in soup.find_all('tr', {'class': 'patFuncEntry'}):
+			title = book.find('span', {'class': 'patFuncTitleMain'}).getText()
+			expires = book.find('td', {'class': 'patFuncStatus'}).getText()
+			s += title + ' ' + expires 
+
+		return s
+	
+	def getAccountInfo(self):
+		s = ''
+		profile_request = self.session.get(self.profile_url)
+		soup = bs4.BeautifulSoup(profile_request.text)
+		info = soup.find('div', {'class': 'patNameAddress'}).getText()
+		
+		return info
+	
+	
 	def getUserData(self):
 
 		name = self.parseInfoName(self.login_request.text)
