@@ -10,7 +10,7 @@ def main():
 	"""
 	cred = cred_from_file()
 	session = SessionCrai(cred[0], cred[1], True)
-	#session.renew_all()
+	session.renew_all()
 	session.close_session()
 
 def cred_from_file(filename = os.path.dirname(os.path.abspath(__file__))+'/data/config.cfg'):
