@@ -1,0 +1,1 @@
+In this directory you may want to create some files storing your credentials or some other data of your interest. For instance, renew_all.py is configured by default to get the credentials from a file named config.cfg in which the first line is the BARCODE and the second line is the PIN used for the login method trough barcode.
