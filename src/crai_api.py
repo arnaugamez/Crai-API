@@ -44,6 +44,11 @@ class SessionCrai:
 
 	def getLoginRequest(self):
 		return self.login_request
+		
+	def getCurrentSoup(self):
+		profile_request = self.session.get(self.profile_url)
+		soup = bs4.BeautifulSoup(profile_request.text)
+		return soup
 
 	def login(self, id, pwd, uses_barcode):
 		
@@ -89,24 +94,14 @@ class SessionCrai:
 
 	def getBooks(self):
 		s = ''
-		profile_request = self.session.get(self.profile_url)
-		soup = bs4.BeautifulSoup(profile_request.text)
-		
-		for book in soup.find_all('tr', {'class': 'patFuncEntry'}):
+		for book in self.getCurrentSoup().find_all('tr', {'class': 'patFuncEntry'}):
 			title = book.find('span', {'class': 'patFuncTitleMain'}).getText()
 			expires = book.find('td', {'class': 'patFuncStatus'}).getText()
-			s += title + ' ' + expires 
-
+			s += title + ' ' + expires
 		return s
 	
 	def getAccountInfo(self):
-		s = ''
-		profile_request = self.session.get(self.profile_url)
-		soup = bs4.BeautifulSoup(profile_request.text)
-		info = soup.find('div', {'class': 'patNameAddress'}).getText()
-		
-		return info
-	
+		return self.getCurrentSoup().find('div', {'class': 'patNameAddress'}).getText()
 	
 	def getUserData(self):
 
