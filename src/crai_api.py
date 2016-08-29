@@ -47,7 +47,7 @@ class SessionCrai:
 		
 	def getCurrentSoup(self):
 		profile_request = self.session.get(self.profile_url)
-		soup = bs4.BeautifulSoup(profile_request.text)
+		soup = bs4.BeautifulSoup(profile_request.text, 'lxml')
 		return soup
 
 	def login(self, id, pwd, uses_barcode):
@@ -93,16 +93,42 @@ class SessionCrai:
 		self.last_request = self.session.post(renew_url, renew_payload, verify=False)
 
 	def getBooks(self):
+		soup = self.getCurrentSoup()
 		s = ''
-		for book in self.getCurrentSoup().find_all('tr', {'class': 'patFuncEntry'}):
+		for book in soup.find_all('tr', {'class': 'patFuncEntry'}):
 			title = book.find('span', {'class': 'patFuncTitleMain'}).getText()
 			expires = book.find('td', {'class': 'patFuncStatus'}).getText()
 			s += title + ' ' + expires
 		return s
 	
 	def getAccountInfo(self):
-		return self.getCurrentSoup().find('div', {'class': 'patNameAddress'}).getText()
-	
+		soup = self.getCurrentSoup()
+		info = soup.find('div', {'class': 'patNameAddress'})
+		text = info.getText()
+		return text
+
+	def isBlocked(self):
+		info = self.getAccountInfo()
+		blockedDate = info.split(':')[2]
+		blocked = not '- -' in blockedDate
+		return blocked
+
+	def bookedBook(self):
+		soup = self.getCurrentSoup()
+		s = ''
+
+		for book in soup.find_all('tr', {'class': 'patFuncEntry'}):
+			title = book.find('span', {'class': 'patFuncTitleMain'}).getText()
+			expires = book.find('td', {'class': 'patFuncStatus'}).getText()
+			if isBooked(expires):
+				s += title + ' ' + expires
+		return s
+
+	''' Metodo pendiente de programar'''
+	def isBooked(expires): 
+		booked = True
+		return booked
+
 	def getUserData(self):
 
 		name = self.parseInfoName(self.login_request.text)
