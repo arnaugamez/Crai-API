@@ -120,13 +120,12 @@ class SessionCrai:
 		for book in soup.find_all('tr', {'class': 'patFuncEntry'}):
 			title = book.find('span', {'class': 'patFuncTitleMain'}).getText()
 			expires = book.find('td', {'class': 'patFuncStatus'}).getText()
-			if isBooked(expires):
+			if self.isBooked(expires):
 				s += title + ' ' + expires
 		return s
 
-	''' Metodo pendiente de programar'''
-	def isBooked(expires): 
-		booked = True
+	def isBooked(self,expires): 
+		booked = '+' in expires
 		return booked
 
 	def getUserData(self):
